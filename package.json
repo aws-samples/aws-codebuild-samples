@@ -1,0 +1,13 @@
+{
+  "name": "simple-calculator-service",
+  "version": "1.0.0",
+  "main": "service.js",
+  "scripts": {
+    "start": "node service.js"
+  },
+  "dependencies": {
+    "numeral": "^2.0.0",
+    "express": "^4.13.3"
+  },
+  "private": "true"
+}
