@@ -11,6 +11,8 @@ permissions:
     owner: ec2-user
     group: ec2-user
 hooks:
+  BeforeInstall:
+    - location: deploy_scripts/install.sh
   ApplicationStop:
     - location: deploy_scripts/stop.sh
       runas: ec2-user
