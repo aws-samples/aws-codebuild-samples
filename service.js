@@ -21,6 +21,11 @@ function sendResult(value, res) {
   res.send(formattedValue);
 }
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
+
 app.get('/', function (req, res) {
   res.send('Simple Calculator Service!');
 })
