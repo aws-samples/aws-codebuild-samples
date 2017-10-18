@@ -53,5 +53,7 @@ app.get('/divide', function (req, res) {
   sendResult(value, res);
 })
 
-app.listen(PORT, HOST);
-console.log(`Running on http://${HOST}:${PORT}`);
+if (!module.parent) {
+  app.listen(PORT, HOST);
+}
+module.exports = app;
