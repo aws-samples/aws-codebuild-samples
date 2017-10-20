@@ -1,0 +1,23 @@
+{
+  "source": [
+    "aws.codecommit"
+  ],
+  "detail-type": [
+    "CodeCommit Repository State Change"
+  ],
+  "detail": {
+    "repositoryName": [
+      "node-calculator-service"
+    ],
+    "referenceType": [
+      "branch"
+    ],
+    "referenceName": [
+      "master"
+    ],
+    "event": [
+      "referenceCreated",
+      "referenceUpdated"
+    ]
+  }
+}
