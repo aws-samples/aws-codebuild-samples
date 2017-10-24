@@ -4,7 +4,7 @@ Utilities and samples for building on CodeBuild
 
 ### Sample App: Simple Calculator Service
 
-Simple Node.js Express-based web service that demonstrates continuous integration with AWS CodeBuild and continuous deployment with AWS CodeDeploy/CodePipeline.  This application was written for demo purposes only, and is definitely not production ready.
+Simple Node.js Express-based web service that demonstrates continuous integration with AWS CodeBuild, AWS CodeCommit, and GitHub, as well as continuous deployment with AWS CodeDeploy/CodePipeline.  This application was written for demo purposes only, and is definitely not production ready.
 
 ### CI Tooling (Buildspecs)
 
@@ -22,6 +22,7 @@ The ci_tools folder contains the following tools for use with AWS Lambda and Ama
 * trigger_codebuild.js: Lambda function to start a CodeBuild build.
 * slack_notifications.js: Lambda function to post CodeBuild build notifications into a Slack channel.
 * email_notifications.js: Lambda function to send CodeBuild build notification emails via Amazon SES.
+* codecommit_pr_notifications: Lambda function to start a CodeBuild build for CodeCommit pull request notifications, and comment on a CodeCommit pull request for CodeCommit build notifications.
 * cwe-rule-configuration/branch_ci.json: CloudWatch Events rule pattern to start a CodeBuild build for every push to the master branch of a CodeCommit repository.
 * cwe-rule-configuration/slack_event_pattern.json: CloudWatch Events rule pattern to notify Slack for failed CodeBuild builds.
 * cwe-rule-configuration/nightly_build_input.json: CloudWatch Events target input to start a CodeBuild build with a specific buildspec override and project name.

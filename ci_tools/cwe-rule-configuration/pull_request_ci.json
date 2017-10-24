@@ -1,0 +1,10 @@
+{
+  "source": [
+    "aws.codecommit",
+    "aws.codebuild"
+  ],
+  "detail-type": [
+    "CodeCommit Pull Request State Change",
+    "CodeBuild Build State Change"
+  ]
+}

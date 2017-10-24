@@ -1,0 +1,9 @@
+{
+  "name": "codecommit-pull-request-bot",
+  "version": "1.0.0",
+  "main": "codecommit_pr_notifications.js",
+  "dependencies": {
+    "aws-sdk": "^2.154.0"
+  },
+  "private": "true"
+}
