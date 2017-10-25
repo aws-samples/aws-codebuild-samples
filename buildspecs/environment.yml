@@ -1,0 +1,16 @@
+version: 0.2
+
+env:
+  variables:
+    IMAGE_REPO_NAME: "node-calculator-build-environment"
+    IMAGE_TAG: "latest"
+
+phases:
+  pre_build:
+    commands:
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION)
+  build:
+    commands:
+      - docker build -f Dockerfile.build_env -t $IMAGE_REPO_NAME:latest .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG

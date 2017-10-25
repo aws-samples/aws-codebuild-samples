@@ -1,0 +1,14 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - mkdir node_modules
+      - cp -a ~/node_modules_cache/. node_modules
+      - npm install
+  build:
+    commands:
+      - npm test
+artifacts:
+  files:
+    - '**/*'
