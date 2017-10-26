@@ -4,7 +4,7 @@
   "main": "service.js",
   "scripts": {
     "start": "node service.js",
-    "test": "./node_modules/mocha/bin/mocha"
+    "test": "nyc --reporter=lcov ./node_modules/mocha/bin/mocha"
   },
   "dependencies": {
     "numeral": "^2.0.0",
@@ -13,7 +13,8 @@
   "devDependencies": {
     "mocha": "^4.0.0",
     "chai": "^3.5.0",
-    "chai-http": "^3.0.0"
+    "chai-http": "^3.0.0",
+    "nyc": "^11.2.0"
   },
   "private": "true"
 }
