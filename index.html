@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Calculator</title>
+  <style>
+    html {
+      color: #000;
+      background-color: #fff;
+      font-family: Arial, sans-serif;
+      font-size: 2em;
+      line-height: 1.1;
+    }
+
+    h1 {
+      font-size: 2em;
+      font-weight: normal;
+      margin-top:10px;
+      margin-bottom:20px;
+    }
+
+    input,select,button {
+      text-align:right;
+      margin-bottom:5px;
+      font-size: 0.7em;
+    }
+
+    #content {
+      width:400px;
+      margin:0px auto;
+      text-align:center;
+    }
+
+    #calculator {
+      width:200px;
+      margin:0px auto;
+      text-align: right;
+      margin-bottom: 10px;
+    }
+
+    .error {
+      color: #dd0000;
+    }
+
+    img {
+      display:block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="content">
+    <img src="https://s3-us-west-2.amazonaws.com/simple-calculator-website-demo/calculator.png"/>
+    <h1>Simple Calculator Service</h1>
+    <div id="calculator">
+      <input id="a" type="text" name="a" size="8" /><br/>
+      <select id="operation" name="operation">
+	<option value="add" selected>+</option>
+	<option value="subtract">-</option>
+	<option value="multiply">*</option>
+	<option value="divide">/</option>
+      </select><br/>
+      <input id="b" type="text" name="b" size="8" /><br/>
+      <button id="calculate" name="calculate">Calculate</button><br/>
+    </div>
+    <span id="result"></span>
+  </div>
+  <script>
+    var aInput = document.getElementById("a");
+    var bInput = document.getElementById("b");
+    var operationSelect = document.getElementById("operation");
+    var calculateButton = document.getElementById("calculate");
+    var resultInput = document.getElementById("result");
+    calculateButton.addEventListener("click", function() {
+      var operation = operationSelect.options[operationSelect.selectedIndex].value;
+      var a = aInput.value;
+      var b = bInput.value;
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', encodeURI('/' + operation + '?a=' + a + '&b=' + b));
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          result.innerHTML = xhr.responseText;
+        }
+        else {
+          result.innerHTML = '<span class="error">' + xhr.responseText + '<span>';
+         }
+      };
+      xhr.send();
+    });
+  </script>
+</body>
+</html>

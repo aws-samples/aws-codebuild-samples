@@ -1,6 +1,7 @@
 const express = require('express');
 const calc = require('./calculator.js');
 var numeral = require('numeral');
+var path = require('path');
 
 const PORT = 8080;
 const HOST = '0.0.0.0';
@@ -27,7 +28,7 @@ app.use(function(req, res, next) {
 });
 
 app.get('/', function (req, res) {
-  res.send('Simple Calculator Service!');
+  res.sendFile(path.join(__dirname + '/index.html'));
 })
 
 app.get('/add', function (req, res) {
