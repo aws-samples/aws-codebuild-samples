@@ -15,6 +15,18 @@ describe('Calculator Tests', function() {
 		});
 	});
 
+	describe('Subtraction Tests', function() {
+		it('returns 2 - 1 = 1', function(done) {
+			assert.equal(calc.add(2, 1), 1);
+			done();
+		});
+
+		it('returns 1 - -1 = 2', function(done) {
+			assert.equal(calc.subtract(1, -1), 2);
+			done();
+		});
+	});
+
 	describe('Multiplication Tests', function() {
 		it('returns 2 * 2 = 4', function(done) {
 			assert.equal(calc.multiply(2, 2), 4);
