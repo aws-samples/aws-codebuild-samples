@@ -17,7 +17,7 @@ describe('Calculator Tests', function() {
 
 	describe('Subtraction Tests', function() {
 		it('returns 2 - 1 = 1', function(done) {
-			assert.equal(calc.add(2, 1), 1);
+			assert.equal(calc.subtract(2, 1), 1);
 			done();
 		});
 
@@ -27,7 +27,7 @@ describe('Calculator Tests', function() {
 		});
 	});
 
-	describe('Multiplication Tests', function() {
+	describe('Multiply Tests', function() {
 		it('returns 2 * 2 = 4', function(done) {
 			assert.equal(calc.multiply(2, 2), 4);
 			done();
