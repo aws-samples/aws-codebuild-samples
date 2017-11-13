@@ -21,6 +21,7 @@ The buildspecs folder contains the following buildspec files for use with AWS Co
 The ci_tools folder contains the following tools for use with AWS Lambda and Amazon CloudWatch Events to hook together the end-to-end CI process:
 * trigger_codebuild.js: Lambda function to start a CodeBuild build.
 * slack_notifications.js: Lambda function to post CodeBuild build notifications into a Slack channel.
+* email_notifications.js: Lambda function to send CodeBuild build notification emails via Amazon SES.
 * cwe-rule-configuration/branch_ci.json: CloudWatch Events rule pattern to start a CodeBuild build for every push to the master branch of a CodeCommit repository.
 * cwe-rule-configuration/slack_event_pattern.json: CloudWatch Events rule pattern to notify Slack for failed CodeBuild builds.
 * cwe-rule-configuration/nightly_build_input.json: CloudWatch Events target input to start a CodeBuild build with a specific buildspec override and project name.
