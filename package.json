@@ -4,7 +4,7 @@
   "main": "service.js",
   "scripts": {
     "start": "node service.js",
-    "test": "nyc --reporter=lcov ./node_modules/mocha/bin/mocha"
+    "test": "./node_modules/nyc/bin/nyc.js --reporter=lcov ./node_modules/mocha/bin/mocha"
   },
   "dependencies": {
     "numeral": "^2.0.0",
