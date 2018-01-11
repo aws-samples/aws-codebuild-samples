@@ -4,6 +4,8 @@ Utilities and samples for building on CodeBuild
 
 ### Sample App: Simple Calculator Service
 
+![CodeBuild badge](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiUXZNTmZhY2Z2NTZzd2o1TTAxY2Q2Mk9LU3ZZcmlXNnFpNUV4YmM5Q0o3TVRCeVAvMG5PZUJ5bDlydE5RenFjTUV5R1NwOEdKTjRZekt2dVcvRjJZN1Y0PSIsIml2UGFyYW1ldGVyU3BlYyI6Im9uT2VYeHlZc2gzeFNobDYiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
+
 Simple Node.js Express-based web service that demonstrates continuous integration with AWS CodeBuild, AWS CodeCommit, and GitHub, as well as continuous deployment with AWS CodeDeploy/CodePipeline.  This application was written for demo purposes only, and is definitely not production ready.
 
 ### CI Tooling (Buildspecs)
