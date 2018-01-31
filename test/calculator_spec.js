@@ -38,4 +38,16 @@ describe('Calculator Tests', function() {
 			done();
 		});
 	});
+
+	describe('Divide Tests', function() {
+		it('returns 2 / 2 = 1', function(done) {
+			assert.equal(calc.divide(2, 2), 1);
+			done();
+		});
+
+		it('returns 4 / 2 = 2', function(done) {
+			assert.equal(calc.divide(4, 2), 2);
+			done();
+		});
+	});
 });
