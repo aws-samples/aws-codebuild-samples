@@ -46,7 +46,7 @@ describe('Calculator Tests', function() {
 		});
 
 		it('returns 4 / 2 = 2', function(done) {
-			assert.equal(calc.multiply(4, 2), 2);
+			assert.equal(calc.divide(4, 2), 2);
 			done();
 		});
 	});
