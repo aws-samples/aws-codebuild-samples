@@ -1,0 +1,110 @@
+Description:
+  This template sets up the sample calculator application on an AutoScaling group,
+  behind an Application Load Balancer, with a CodeDeploy application.
+
+Parameters:
+  SharedResourceStack:
+    Description: Name of an active CloudFormation stack that contains shared resources, such as the VPC.
+    Type: String
+    MinLength: 1
+    MaxLength: 255
+    AllowedPattern: "^[a-zA-Z][-a-zA-Z0-9]*$"
+    Default: CodeBuildSampleSharedResources
+  Stage:
+    Description: Release stage
+    Type: String
+    MinLength: 1
+    MaxLength: 255
+    AllowedPattern: "^[a-zA-Z][-a-zA-Z0-9]*$"
+    Default: Prod
+
+Resources:
+  DeploymentGroup:
+    Type: "AWS::CodeDeploy::DeploymentGroup"
+    Properties:
+      DeploymentGroupName: !Join
+      - '-'
+      - - !Ref 'AWS::StackName'
+        - DeploymentGroup
+      ApplicationName:
+        Fn::ImportValue:
+          !Sub "${SharedResourceStack}:CodeDeployApplication"
+      ServiceRoleArn:
+        Fn::ImportValue:
+          !Sub "${SharedResourceStack}:CodeDeployRole"
+      DeploymentConfigName: CodeDeployDefault.AllAtOnce
+      AutoScalingGroups:
+      - Ref: AutoScalingGroup
+
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      MinSize: 3
+      MaxSize: 3
+      LaunchConfigurationName:
+        Fn::ImportValue:
+          !Sub "${SharedResourceStack}:LaunchConfig"
+      VPCZoneIdentifier:
+        Fn::Split:
+        - ","
+        - Fn::ImportValue:
+            !Sub "${SharedResourceStack}:PrivateSubnets"
+      TargetGroupARNs:
+        - Ref: LoadBalancerTargetGroup
+      Tags:
+        - Key: Name
+          Value: !Join
+          - "-"
+          - - Fn::ImportValue:
+                !Sub "${SharedResourceStack}:ApplicationName"
+            - !Ref Stage
+          PropagateAtLaunch: true
+
+  LoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        -
+          Type: forward
+          TargetGroupArn:
+            Ref: LoadBalancerTargetGroup
+      LoadBalancerArn:
+        Ref: LoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      Subnets:
+        Fn::Split:
+        - ","
+        - Fn::ImportValue:
+            !Sub "${SharedResourceStack}:PublicSubnets"
+      SecurityGroups:
+        - Fn::ImportValue:
+            !Sub "${SharedResourceStack}:PublicHttpIngressSecurityGroup"
+
+  LoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      UnhealthyThresholdCount: 2
+      HealthyThresholdCount: 2
+      Port: 8080
+      Protocol: HTTP
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${SharedResourceStack}:VPC"
+
+Outputs:
+  Url:
+    Description: Calculator application URL
+    Value:
+      Fn::Sub: 'http://${LoadBalancer.DNSName}'
+  DeploymentGroup:
+    Description: Calculator application deployment group
+    Value: !Ref DeploymentGroup

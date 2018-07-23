@@ -1,0 +1,146 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Perform continuous integration pull request checks on a CodeCommit repository with CodeBuild
+
+Parameters:
+  CodeCommitRepoName:
+    Description: A CodeCommit repository that contains the application code. Must be in same region as this stack.
+    Type: String
+    Default: aws-codebuild-samples
+
+Resources:
+  SourceEvent:
+    Properties:
+      Description: Rule for Amazon CloudWatch Events to detect pull request changes in the source repository and trigger parallel builds
+      EventPattern:
+        detail:
+          event:
+          - pullRequestCreated
+          - pullRequestSourceBranchUpdated
+        detail-type:
+        - CodeCommit Pull Request State Change
+        resources:
+        - !Join
+          - ':'
+          - - 'arn:aws:codecommit'
+            - !Ref 'AWS::Region'
+            - !Ref 'AWS::AccountId'
+            - !Ref 'CodeCommitRepoName'
+        source:
+        - aws.codecommit
+      Name: !Join
+      - '-'
+      - - !Ref 'AWS::StackName'
+        - SourceEvent
+      State: ENABLED
+      Targets:
+      - Arn: !GetAtt 'CodeBuildProject.Arn'
+        Id: Build1
+        RoleArn: !GetAtt 'SourceEventRole.Arn'
+        Input: '{"buildspecOverride":"buildspecs/build-test-suite-1.yml"}'
+      - Arn: !GetAtt 'CodeBuildProject.Arn'
+        Id: Build2
+        RoleArn: !GetAtt 'SourceEventRole.Arn'
+        Input: '{"buildspecOverride":"buildspecs/build-test-suite-2.yml"}'
+    Type: AWS::Events::Rule
+
+  SourceEventRole:
+    Description: IAM role to allow Amazon CloudWatch Events to trigger AWS CodeBuild build
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - events.amazonaws.com
+          Sid: 1
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - codebuild:StartBuild
+            Effect: Allow
+            Resource: !GetAtt 'CodeBuildProject.Arn'
+        PolicyName: !Join
+          - '-'
+          - - !Ref 'AWS::StackName'
+            - CloudWatchEventPolicy
+      RoleName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - CloudWatchEventRule
+    Type: AWS::IAM::Role
+
+  CodeBuildPolicy:
+    Description: Setting IAM policy for service role for CodeBuild
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Action:
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+          Effect: Allow
+          Resource: '*'
+        - Action:
+          - codecommit:GitPull
+          Effect: Allow
+          Resource:
+          - !Join
+            - ':'
+            - - arn
+              - aws
+              - codecommit
+              - !Ref 'AWS::Region'
+              - !Ref 'AWS::AccountId'
+              - !Ref CodeCommitRepoName
+      PolicyName: !Join
+        - '-'
+        -  - !Ref 'AWS::StackName'
+           - CodeBuildPolicy
+      Roles:
+      - !Ref 'CodeBuildRole'
+    Type: AWS::IAM::Policy
+
+  CodeBuildProject:
+    DependsOn:
+    - CodeBuildPolicy
+    Properties:
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Description: !Join
+        - ''
+        - - 'CodeBuild Project for '
+          - !Ref 'AWS::StackName'
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/nodejs:8.11.0
+        Type: LINUX_CONTAINER
+      Name: !Ref 'AWS::StackName'
+      ServiceRole: !Ref 'CodeBuildRole'
+      Source:
+        Type: CODECOMMIT
+        Location: !Join
+          - ''
+          - - 'https://git-codecommit.'
+            - !Ref 'AWS::Region'
+            - '.amazonaws.com/v1/repos/'
+            - !Ref 'CodeCommitRepoName'
+    Type: AWS::CodeBuild::Project
+
+  CodeBuildRole:
+    Description: Creating service role in IAM for Amazon EC2 instances
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: codebuild.amazonaws.com
+      Path: /
+      RoleName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - CodeBuild
+    Type: AWS::IAM::Role

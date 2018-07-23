@@ -33,6 +33,35 @@ The ci_tools folder contains the following tools for use with AWS Lambda and Ama
 
 Contains an appspec.yml file and deploy_scripts folder for deploying the service with AWS CodeDeploy.
 
+### CloudFormation
+
+Create a CodeCommit repository called 'aws-codebuild-samples' and push this sample code into the repo.  Then spin up all of the above easily with CloudFormation.
+
+Create the continuous deployment stack, with a CodePipeline pipeline:
+```
+aws cloudformation create-stack --stack-name aws-codebuild-samples --template-body file://cloudformation/continuous-deployment.yml --capabilities CAPABILITY_NAMED_IAM
+
+aws cloudformation wait stack-create-complete --stack-name aws-codebuild-samples
+
+aws cloudformation describe-stacks --stack-name aws-codebuild-samples --query 'Stacks[0].Outputs[?OutputKey==`PipelineConsoleUrl`].OutputValue' --output text
+```
+
+Wait for the pipeline to finish deploying, then access the Test and Prod stack applications:
+```
+aws cloudformation describe-stacks --stack-name aws-codebuild-samples-test-stack --query 'Stacks[0].Outputs[?OutputKey==`Url`].OutputValue' --output text
+
+aws cloudformation describe-stacks --stack-name aws-codebuild-samples-prod-stack --query 'Stacks[0].Outputs[?OutputKey==`Url`].OutputValue' --output text
+```
+
+Set up continuous integration for the application:
+```
+aws cloudformation create-stack --stack-name aws-codebuild-samples-nightly-checks --template-body file://cloudformation/continuous-integration-nightly-checks.yml --capabilities CAPABILITY_NAMED_IAM
+
+aws cloudformation create-stack --stack-name aws-codebuild-samples-branch-checks --template-body file://cloudformation/continuous-integration-branch-checks.yml --capabilities CAPABILITY_NAMED_IAM
+
+aws cloudformation create-stack --stack-name aws-codebuild-samples-pull-request-checks --template-body file://cloudformation/continuous-integration-pull-request-checks.yml --capabilities CAPABILITY_NAMED_IAM
+```
+
 ## License
 
 This library is licensed under the Apache 2.0 License.
