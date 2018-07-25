@@ -1,9 +1,8 @@
 'use strict';
 
 const AWS = require('aws-sdk');
-const codebuild = new AWS.CodeBuild();
 const cloudwatchlogs = new AWS.CloudWatchLogs();
-const ses = new AWS.SES();
+const ses = new AWS.SES({region: 'us-west-2'});
 const sourceEmailAddress = process.env.sourceEmailAddress;
 const destinationEmailAddress = process.env.destinationEmailAddress;
 
@@ -48,8 +47,6 @@ function handleBuildEvent(event, callback) {
     const buildArn = event.detail['build-id'];
     const buildId = buildArn.split('/').pop();
     const buildUuid = buildId.split(':').pop();
-    const sourceUrl = event.detail['additional-information'].source.location;
-    const repoName = sourceUrl.split('/').pop();
     const projectName = event.detail['project-name'];
     const region = event.region;
 

@@ -33,15 +33,14 @@ The ci_tools folder contains the following tools for use with AWS Lambda and Ama
 
 Contains an appspec.yml file and deploy_scripts folder for deploying the service with AWS CodeDeploy.
 
-### CloudFormation
+## CloudFormation Templates
 
 Create a CodeCommit repository called 'aws-codebuild-samples' and push this sample code into the repo.  Then spin up all of the above easily with CloudFormation.
 
-Create the continuous deployment stack, with a CodePipeline pipeline:
+### Continuous Deployment
+Set up continuous deployment with a CodePipeline pipeline:
 ```
-aws cloudformation create-stack --stack-name aws-codebuild-samples --template-body file://cloudformation/continuous-deployment.yml --capabilities CAPABILITY_NAMED_IAM
-
-aws cloudformation wait stack-create-complete --stack-name aws-codebuild-samples
+aws cloudformation deploy --stack-name aws-codebuild-samples --template-file cloudformation/continuous-deployment.yml --capabilities CAPABILITY_NAMED_IAM
 
 aws cloudformation describe-stacks --stack-name aws-codebuild-samples --query 'Stacks[0].Outputs[?OutputKey==`PipelineConsoleUrl`].OutputValue' --output text
 ```
@@ -53,13 +52,30 @@ aws cloudformation describe-stacks --stack-name aws-codebuild-samples-test-stack
 aws cloudformation describe-stacks --stack-name aws-codebuild-samples-prod-stack --query 'Stacks[0].Outputs[?OutputKey==`Url`].OutputValue' --output text
 ```
 
-Set up continuous integration for the application:
+### Continuous Integration: Nightly Checks
+
+Choose an email address for receiving email notifications.  Then, [verify the email address in SES](https://us-west-2.console.aws.amazon.com/ses/home?region=us-west-2#verified-senders-email:) before setting up the CloudFormation stack.
+
 ```
-aws cloudformation create-stack --stack-name aws-codebuild-samples-nightly-checks --template-body file://cloudformation/continuous-integration-nightly-checks.yml --capabilities CAPABILITY_NAMED_IAM
+mkdir build
 
-aws cloudformation create-stack --stack-name aws-codebuild-samples-branch-checks --template-body file://cloudformation/continuous-integration-branch-checks.yml --capabilities CAPABILITY_NAMED_IAM
+S3_BUCKET=$(aws cloudformation describe-stacks --stack-name aws-codebuild-samples --query 'Stacks[0].Outputs[?OutputKey==`ArtifactsBucket`].OutputValue' --output text)
 
-aws cloudformation create-stack --stack-name aws-codebuild-samples-pull-request-checks --template-body file://cloudformation/continuous-integration-pull-request-checks.yml --capabilities CAPABILITY_NAMED_IAM
+aws cloudformation package --template-file cloudformation/continuous-integration-nightly-checks.yml --s3-bucket $S3_BUCKET --force-upload --output-template-file build/continuous-integration-nightly-checks.yml
+
+aws cloudformation deploy --stack-name aws-codebuild-samples-nightly-checks --template-file build/continuous-integration-nightly-checks.yml --capabilities CAPABILITY_NAMED_IAM --parameter-overrides NotificationEmailAddress="example@example.com"
+```
+
+### Continuous Integration: Branch Checks
+
+```
+aws cloudformation deploy --stack-name aws-codebuild-samples-branch-checks --template-file cloudformation/continuous-integration-branch-checks.yml --capabilities CAPABILITY_NAMED_IAM
+```
+
+### Continuous Integration: Pull Request Checks
+
+```
+aws cloudformation deploy --stack-name aws-codebuild-samples-pull-request-checks --template-file cloudformation/continuous-integration-pull-request-checks.yml --capabilities CAPABILITY_NAMED_IAM
 ```
 
 ## License

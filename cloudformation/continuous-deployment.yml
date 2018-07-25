@@ -25,6 +25,15 @@ Outputs:
         - !Ref 'AWS::Region'
         - '#/view/'
         - !Ref 'AWS::StackName'
+  ArtifactsBucket:
+    Description: S3 bucket used for artifacts
+    Export:
+      Name: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - !Ref 'AWS::Region'
+          - ArtifactsBucket
+    Value: !Ref ArtifactsBucket
 
 Resources:
   CloudFormationTrustRole:
