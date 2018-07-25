@@ -68,8 +68,23 @@ aws cloudformation deploy --stack-name aws-codebuild-samples-nightly-checks --te
 
 ### Continuous Integration: Branch Checks
 
+Configure the webhook in Slack:
+1. Navigate to https://<your-team-domain>.slack.com/apps
+1. Search for and select "Incoming Webhooks".
+1. Click "Add Configuration".
+1. Choose a channel and click "Add Slash Command Integration".
+1. Copy the Webhook URL from the integration settings.
+1. Store the token in Parameter Store: `aws ssm put-parameter --name codebuild-samples-slack-webhook --type SecureString --value <webhook URL>` (Note: you will need to set `cli_follow_urlparam = false` in your AWS CLI config file first)
+
+Then spin up the stack in CloudFormation:
 ```
-aws cloudformation deploy --stack-name aws-codebuild-samples-branch-checks --template-file cloudformation/continuous-integration-branch-checks.yml --capabilities CAPABILITY_NAMED_IAM
+mkdir build
+
+S3_BUCKET=$(aws cloudformation describe-stacks --stack-name aws-codebuild-samples --query 'Stacks[0].Outputs[?OutputKey==`ArtifactsBucket`].OutputValue' --output text)
+
+aws cloudformation package --template-file cloudformation/continuous-integration-branch-checks.yml --s3-bucket $S3_BUCKET --force-upload --output-template-file build/continuous-integration-branch-checks.yml
+
+aws cloudformation deploy --stack-name aws-codebuild-samples-branch-checks --template-file build/continuous-integration-branch-checks.yml --capabilities CAPABILITY_NAMED_IAM
 ```
 
 ### Continuous Integration: Pull Request Checks

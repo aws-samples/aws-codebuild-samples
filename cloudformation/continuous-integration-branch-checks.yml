@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
 
 Description: Perform continuous integration branch-level checks on a CodeCommit repository with CodeBuild
 
@@ -7,6 +8,10 @@ Parameters:
     Description: A CodeCommit repository that contains the application code. Must be in same region as this stack.
     Type: String
     Default: aws-codebuild-samples
+  SlackHookUrlParameter:
+    Description: Parameter Store parameter where encrypted Slack hook URL is stored
+    Type: AWS::SSM::Parameter::Name
+    Default: codebuild-samples-slack-webhook
 
 Resources:
   SourceEvent:
@@ -145,3 +150,41 @@ Resources:
         - - !Ref 'AWS::StackName'
           - CodeBuild
     Type: AWS::IAM::Role
+
+  SlackNotifications:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: slack_notifications.handler
+      Runtime: nodejs8.10
+      CodeUri: ../ci_tools
+      Description: >-
+        Sends message to Slack channel when branch-check builds fail
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - KMSDecryptPolicy:
+            KeyId: '*'
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Action:
+                - "ssm:GetParameter"
+              Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${SlackHookUrlParameter}"
+      Events:
+        BuildTrigger:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              source:
+                - aws.codebuild
+              detail-type:
+                - CodeBuild Build State Change
+              detail:
+                build-status:
+                  - FAILED
+                  - TIMED_OUT
+                additional-information:
+                  initiator:
+                    - !Sub "rule/${SourceEvent}"
+      Environment:
+        Variables:
+          hookUrlParameter: !Ref SlackHookUrlParameter

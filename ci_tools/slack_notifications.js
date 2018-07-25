@@ -9,17 +9,14 @@ This code is intended to be used in an AWS Lambda function triggered by an Amazo
 
 Follow these steps to configure the webhook in Slack:
 
-    Navigate to https://.slack.com/services/new
+    Navigate to https://<your-team-domain>.slack.com/apps
     Search for and select "Incoming WebHooks".
     Choose the default channel where messages will be sent and click "Add Incoming WebHooks Integration".
-    Copy the webhook URL from the setup instructions and use it in the next section.
+    Copy the webhook URL from the setup instructions and save it to an SSM Parameter Store SecureString parameter.
 
-To encrypt your secrets use the following steps:
+Paste the name of the ParameterStore parameter into an 'hookUrlParameter' environment variable for the Lambda function.
 
-    Create or use an existing KMS Key - http://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html
-    Click the "Enable Encryption Helpers" checkbox
-    Paste <SLACK_HOOK_URL> into the kmsEncryptedHookUrl environment variable and click encrypt Note: You must exclude the protocol from the URL (e.g. "hooks.slack.com/services/abc123").
-    Give your function's role permission for the kms:Decrypt action.
+Give your function's role permission for the kms:Decrypt action.
 
 Example:
 
@@ -40,10 +37,7 @@ Example:
 }
 */
 
-// The base-64 encoded, encrypted key (CiphertextBlob) stored in the kmsEncryptedHookUrl environment variable
-const kmsEncryptedHookUrl = process.env.kmsEncryptedHookUrl;
-// The Slack channel to send a message to stored in the slackChannel environment variable
-const slackChannel = process.env.slackChannel;
+const hookUrlParameter = process.env.hookUrlParameter;
 let hookUrl;
 
 
@@ -85,7 +79,6 @@ function processEvent(event, callback) {
     const region = event.region;
 
     const slackMessage = {
-        channel: slackChannel,
         text: `Build ${buildUuid} for project ${projectName} has reached ${buildStatus} status. ` +
         `Visit the <https:\/\/${region}.console.aws.amazon.com\/codebuild\/home?region=${region}#\/builds\/${encodeURI(buildId)}\/view\/new|AWS console> to view details.`,
     };
@@ -108,20 +101,21 @@ exports.handler = (event, context, callback) => {
     if (hookUrl) {
         // Container reuse, simply process the event with the key in memory
         processEvent(event, callback);
-    } else if (kmsEncryptedHookUrl && kmsEncryptedHookUrl !== '<kmsEncryptedHookUrl>') {
-        const encryptedBuf = new Buffer(kmsEncryptedHookUrl, 'base64');
-        const cipherText = { CiphertextBlob: encryptedBuf };
-
-        const kms = new AWS.KMS();
-        kms.decrypt(cipherText, (err, data) => {
+    } else if (hookUrlParameter) {
+        const ssm = new AWS.SSM();
+        const params = {
+          Name: hookUrlParameter,
+          WithDecryption: true
+        };
+        ssm.getParameter(params, (err, data) => {
             if (err) {
-                console.log('Decrypt error:', err);
+                console.log('Hook URL parameter error:', err);
                 return callback(err);
             }
-            hookUrl = `https://${data.Plaintext.toString('ascii')}`;
+            hookUrl = data.Parameter.Value;
             processEvent(event, callback);
         });
     } else {
-        callback('Hook URL has not been set.');
+        callback('Hook URL parameter has not been set.');
     }
 };
