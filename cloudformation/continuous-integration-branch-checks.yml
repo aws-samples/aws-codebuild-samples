@@ -41,7 +41,7 @@ Resources:
       - Arn: !GetAtt 'CodeBuildProject.Arn'
         Id: TriggerBuild
         RoleArn: !GetAtt 'SourceEventRole.Arn'
-        Input: '{"buildspecOverride":"buildspec.yml"}'
+        Input: '{"buildspecOverride":"buildspec.yml","sourceVersion":"master"}'
     Type: AWS::Events::Rule
 
   SourceEventRole:
@@ -109,6 +109,7 @@ Resources:
     Properties:
       Artifacts:
         Type: NO_ARTIFACTS
+      BadgeEnabled: true
       Description: !Join
         - ''
         - - 'CodeBuild Project for '
