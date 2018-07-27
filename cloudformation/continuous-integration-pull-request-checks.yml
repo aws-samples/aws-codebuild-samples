@@ -37,11 +37,63 @@ Resources:
       - Arn: !GetAtt 'CodeBuildProject.Arn'
         Id: Build1
         RoleArn: !GetAtt 'SourceEventRole.Arn'
-        Input: '{"buildspecOverride":"buildspecs/build-test-suite-1.yml"}'
+        InputTransformer:
+          InputPathsMap:
+            pullRequestId: "$.detail.pullRequestId"
+            sourceCommit: "$.detail.sourceCommit"
+            destinationCommit: "$.detail.destinationCommit"
+          InputTemplate: >-
+              {
+                "buildspecOverride": "buildspecs/build-test-suite-1.yml",
+                "sourceVersion": <sourceCommit>,
+                "environmentVariablesOverride": [
+                  {
+                    "name": "CODECOMMIT_PULL_REQUEST_ID",
+                    "value": <pullRequestId>,
+                    "type": "PLAINTEXT"
+                  },
+                  {
+                    "name": "CODECOMMIT_PULL_REQUEST_SRC_COMMIT",
+                    "value": <sourceCommit>,
+                    "type": "PLAINTEXT"
+                  },
+                  {
+                    "name": "CODECOMMIT_PULL_REQUEST_DST_COMMIT",
+                    "value": <destinationCommit>,
+                    "type": "PLAINTEXT"
+                  }
+                ]
+              }
       - Arn: !GetAtt 'CodeBuildProject.Arn'
         Id: Build2
         RoleArn: !GetAtt 'SourceEventRole.Arn'
-        Input: '{"buildspecOverride":"buildspecs/build-test-suite-2.yml"}'
+        InputTransformer:
+          InputPathsMap:
+            pullRequestId: "$.detail.pullRequestId"
+            sourceCommit: "$.detail.sourceCommit"
+            destinationCommit: "$.detail.destinationCommit"
+          InputTemplate: >-
+              {
+                "buildspecOverride": "buildspecs/build-test-suite-2.yml",
+                "sourceVersion": <sourceCommit>,
+                "environmentVariablesOverride": [
+                  {
+                    "name": "CODECOMMIT_PULL_REQUEST_ID",
+                    "value": <pullRequestId>,
+                    "type": "PLAINTEXT"
+                  },
+                  {
+                    "name": "CODECOMMIT_PULL_REQUEST_SRC_COMMIT",
+                    "value": <sourceCommit>,
+                    "type": "PLAINTEXT"
+                  },
+                  {
+                    "name": "CODECOMMIT_PULL_REQUEST_DST_COMMIT",
+                    "value": <destinationCommit>,
+                    "type": "PLAINTEXT"
+                  }
+                ]
+              }
     Type: AWS::Events::Rule
 
   SourceEventRole:

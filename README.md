@@ -89,8 +89,15 @@ aws cloudformation deploy --stack-name aws-codebuild-samples-branch-checks --tem
 
 ### Continuous Integration: Pull Request Checks
 
+Spin up the stack in CloudFormation:
 ```
-aws cloudformation deploy --stack-name aws-codebuild-samples-pull-request-checks --template-file cloudformation/continuous-integration-pull-request-checks.yml --capabilities CAPABILITY_NAMED_IAM
+mkdir build
+
+S3_BUCKET=$(aws cloudformation describe-stacks --stack-name aws-codebuild-samples --query 'Stacks[0].Outputs[?OutputKey==`ArtifactsBucket`].OutputValue' --output text)
+
+aws cloudformation package --template-file cloudformation/continuous-integration-pull-request-checks.yml --s3-bucket $S3_BUCKET --force-upload --output-template-file build/continuous-integration-pull-request-checks.yml
+
+aws cloudformation deploy --stack-name aws-codebuild-samples-pull-request-checks --template-file build/continuous-integration-pull-request-checks.yml --capabilities CAPABILITY_NAMED_IAM
 ```
 
 ## License
