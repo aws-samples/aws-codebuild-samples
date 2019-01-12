@@ -198,7 +198,7 @@ Resources:
     Type: AWS::CodeBuild::Project
 
   CodeBuildRole:
-    Description: Creating service role in IAM for Amazon EC2 instances
+    Description: Creating service role in IAM for AWS CodeBuild
     Properties:
       AssumeRolePolicyDocument:
         Statement:
