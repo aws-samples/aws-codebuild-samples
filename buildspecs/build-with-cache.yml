@@ -13,3 +13,6 @@ cache:
 artifacts:
   files:
     - '**/*'
+post_build:
+    commands:
+      - aws cloudfront create-invalidation --distribution-id "E3UORLOTWWVERB" --paths /index.html /* /static/* /favicon.ico
