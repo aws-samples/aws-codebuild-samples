@@ -11,4 +11,4 @@ phases:
       - npm test
 artifacts:
   files:
-    - '**/*'
+    - 'coverage/**/*'
