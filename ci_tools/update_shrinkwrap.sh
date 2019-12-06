@@ -5,8 +5,8 @@ set -ev
 # Set up git client
 git config --global credential.helper '!aws codecommit credential-helper $@'
 git config --global credential.UseHttpPath true
-git config --global user.name "Shrinkwrapper Bot"
-git config --global user.email shrinkwrapper@example.com
+git config --global user.name "ParEricsson"
+git config --global user.email par.ericsson@cybercom.com
 git config --global push.default simple
 
 if [ -e npm-shrinkwrap.json ]
