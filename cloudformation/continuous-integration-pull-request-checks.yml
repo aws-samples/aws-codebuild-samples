@@ -202,7 +202,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: codecommit_pr_notifications.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       CodeUri: ../ci_tools
       Description: >-
         Comment on the CodeCommit pull request when a build is triggered and when it completes
