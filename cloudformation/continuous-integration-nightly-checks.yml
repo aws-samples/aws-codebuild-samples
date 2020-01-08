@@ -151,7 +151,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: email_notifications.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       CodeUri: ../ci_tools
       Description: >-
         Sends emails when builds fail
