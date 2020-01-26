@@ -22,8 +22,6 @@ Resources:
           event:
           - referenceCreated
           - referenceUpdated
-          referenceName:
-          - master
           referenceType:
           - branch
         detail-type:
@@ -46,7 +44,14 @@ Resources:
       - Arn: !GetAtt 'CodeBuildProject.Arn'
         Id: TriggerBuild
         RoleArn: !GetAtt 'SourceEventRole.Arn'
-        Input: '{"buildspecOverride":"buildspec.yml","sourceVersion":"master"}'
+        InputTransformer:
+          InputPathsMap:
+            sourceVersion: "$.detail.referenceName"
+          InputTemplate: >-
+              {
+                "buildspecOverride": "buildspec.yml",
+                "sourceVersion": <sourceVersion>
+              }
     Type: AWS::Events::Rule
 
   SourceEventRole:
