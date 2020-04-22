@@ -1,7 +1,5 @@
 ## AWS CodeBuild Samples
 
-
-
 Utilities and samples for building on CodeBuild
 
 ### Sample App: Simple Calculator Service
@@ -101,6 +99,8 @@ aws cloudformation package --template-file cloudformation/continuous-integration
 
 aws cloudformation deploy --stack-name aws-codebuild-samples-pull-request-checks --template-file build/continuous-integration-pull-request-checks.yml --capabilities CAPABILITY_NAMED_IAM
 ```
+
+
 
 ## License
 
