@@ -100,11 +100,6 @@ aws cloudformation package --template-file cloudformation/continuous-integration
 aws cloudformation deploy --stack-name aws-codebuild-samples-pull-request-checks --template-file build/continuous-integration-pull-request-checks.yml --capabilities CAPABILITY_NAMED_IAM
 ```
 
-
-
-
-
-
 ## License
 
 This library is licensed under the Apache 2.0 License.
