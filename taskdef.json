@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "generic",
-      "image": "<IMAGE1_NAME>",
+      "image": "133150622354.dkr.ecr.eu-west-1.amazonaws.com/ecr-oeg-test:latest",
       "essential": true,
       "portMappings": [
         {
