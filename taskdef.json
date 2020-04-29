@@ -2,7 +2,7 @@
   "executionRoleArn": "arn:aws:iam::133150622354:role/codedeploy-for-ecs-ecs-task-execution",
   "containerDefinitions": [
     {
-      "name": "generic",
+      "name": "contract-mapper",
       "image": "<IMAGE_NAME>",
       "essential": true,
       "portMappings": [
