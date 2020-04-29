@@ -20,8 +20,9 @@ phases:
       - echo Pushing the Docker image...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
       - IMAGE_NAME=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
-      - sed -i'' -e "s/<IMAGE_NAME>/${IMAGE_NAME}/g" taskdef.json
-      - printf "{\"ImageURI\":\"${IMAGE_NAME}\"}" > imageDetail.json
+      - echo "IMAGE_NAME is $IMAGE_NAME"
+      - sed -i'' -e "s/<IMAGE_NAME>/$IMAGE_NAME/g" taskdef.json
+      - printf "{\"ImageURI\":\"$IMAGE_NAME\"}" > imageDetail.json
       - cat imageDetail.json
 artifacts:
   files:
