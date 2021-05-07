@@ -160,7 +160,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: slack_notifications.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs14.x
       CodeUri: ../ci_tools
       Description: >-
         Sends message to Slack channel when branch-check builds fail
